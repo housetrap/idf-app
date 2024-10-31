@@ -1,0 +1,8 @@
+## IDF Component Manager Manifest File
+dependencies:
+  app:
+    override_path: "../../../"
+  supcik/status_led: "^1.0.5"
+  espressif/mdns: "*"
+  idf:
+    version: ">=5.3.0"
