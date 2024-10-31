@@ -22,7 +22,7 @@
 
 static const char* kTag = "firmware_upgrade";
 
-Updater* Updater::instance_           = nullptr;
+Updater* Updater::instance_ = nullptr;
 SemaphoreHandle_t Updater::semaphore_ = xSemaphoreCreateMutex();
 
 Updater* Updater::GetInstance() {
@@ -75,12 +75,12 @@ void Updater::EventHandler(esp_event_base_t event_base, int32_t event_id, void* 
 
 esp_err_t Updater::Update(const char* url) {
     esp_http_client_config_t config = {};
-    config.url                      = url;
-    config.crt_bundle_attach        = esp_crt_bundle_attach;
+    config.url = url;
+    config.crt_bundle_attach = esp_crt_bundle_attach;
 
     esp_https_ota_config_t ota_config = {};
-    ota_config.http_config            = &config;
-    ota_config.partial_http_download  = true;
+    ota_config.http_config = &config;
+    ota_config.partial_http_download = true;
 
     ESP_ERROR_CHECK(esp_event_handler_register(
         ESP_HTTPS_OTA_EVENT, ESP_EVENT_ANY_ID, EventHandlerForwarder, nullptr));

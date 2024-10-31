@@ -23,7 +23,7 @@
 
 static const char* kTag = "mqtt";
 
-MQTT* MQTT::instance_              = nullptr;
+MQTT* MQTT::instance_ = nullptr;
 SemaphoreHandle_t MQTT::semaphore_ = xSemaphoreCreateMutex();
 
 static void LogErrorIfNonZero(const char* message, int errorCode) {
@@ -46,7 +46,7 @@ MQTT* MQTT::GetInstance() {
 void MQTT::AddSubscription(const char* topic, int qos) {
     subscription t = {
         .topic = std::string(topic),
-        .qos   = qos,
+        .qos = qos,
     };
     subscriptions_.push_back(t);
 }
@@ -56,9 +56,9 @@ MQTT::MQTT() { connected_ = false; }
 esp_err_t MQTT::Init() {
     NvsHandle handle;
 
-    char broker[64]     = {0};
-    char username[64]   = {0};
-    char password[64]   = {0};
+    char broker[64] = {0};
+    char username[64] = {0};
+    char password[64] = {0};
     char topic_base[64] = {0};
 
     handle.Open("mqtt", NVS_READONLY);
@@ -82,9 +82,9 @@ esp_err_t MQTT::Init() {
     topic_base_ = std::string(topic_base);
 
     esp_mqtt_client_config_t mqtt_cfg = {};
-    mqtt_cfg.broker.address.uri       = broker;
+    mqtt_cfg.broker.address.uri = broker;
     if (strlen(username) > 0 && strlen(password) > 0) {
-        mqtt_cfg.credentials.username                = username;
+        mqtt_cfg.credentials.username = username;
         mqtt_cfg.credentials.authentication.password = password;
     }
 
@@ -114,7 +114,7 @@ esp_err_t MQTT::Start() {
 }
 
 void MQTT::EventHandler(esp_event_base_t event_base, int32_t event_id, void* event_data) {
-    esp_mqtt_event_handle_t event   = (esp_mqtt_event_handle_t)event_data;
+    esp_mqtt_event_handle_t event = (esp_mqtt_event_handle_t)event_data;
     esp_mqtt_client_handle_t client = event->client;
 
     switch ((esp_mqtt_event_id_t)event_id) {

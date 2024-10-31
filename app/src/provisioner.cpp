@@ -27,7 +27,7 @@
 
 static const char* kTag = "provisioner";
 
-Provisioner* Provisioner::instance_       = nullptr;
+Provisioner* Provisioner::instance_ = nullptr;
 SemaphoreHandle_t Provisioner::semaphore_ = xSemaphoreCreateMutex();
 
 Provisioner* Provisioner::GetInstance() {
@@ -44,8 +44,8 @@ Provisioner* Provisioner::GetInstance() {
 Provisioner::Provisioner() {
     // Configuration for the provisioning manager
     wifi_prov_mgr_config_t config = {};
-    config.scheme                 = wifi_prov_scheme_ble;
-    config.scheme_event_handler   = WIFI_PROV_SCHEME_BLE_EVENT_HANDLER_FREE_BTDM;
+    config.scheme = wifi_prov_scheme_ble;
+    config.scheme_event_handler = WIFI_PROV_SCHEME_BLE_EVENT_HANDLER_FREE_BTDM;
     ESP_ERROR_CHECK(wifi_prov_mgr_init(config));
 
     wifi_event_group_ = xEventGroupCreate();

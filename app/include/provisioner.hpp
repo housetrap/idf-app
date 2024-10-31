@@ -38,11 +38,11 @@ class Provisioner {
     static SemaphoreHandle_t semaphore_;
 
     Provisioner();
-    Provisioner(Provisioner const&)    = delete;
+    Provisioner(Provisioner const&) = delete;
     void operator=(Provisioner const&) = delete;
 
     static const int kWifiConnectedEvent = BIT0;
-    static const int kMaxRetriesCount    = 5;
+    static const int kMaxRetriesCount = 5;
     void InitSTA();
     void EventHandler(esp_event_base_t event_base, int32_t event_id, void* event_data);
     static void EventHandlerForwarder(void* arg,

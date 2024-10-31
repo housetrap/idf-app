@@ -32,8 +32,8 @@ class Updater {
     static Updater* instance_;
     static SemaphoreHandle_t semaphore_;
 
-    Updater() {};
-    Updater(Updater const&)        = delete;
+    Updater(){};
+    Updater(Updater const&) = delete;
     void operator=(Updater const&) = delete;
 
     void EventHandler(esp_event_base_t event_base, int32_t event_id, void* event_data);

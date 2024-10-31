@@ -38,49 +38,49 @@ esp_err_t NvsHandle::GetInt(const char* key, nvs_type_t type, double* value) {
         case NVS_TYPE_U8: {
             uint8_t u8;
             esp_err_t err = nvs_get_u8(handle_, key, &u8);
-            *value        = u8;
+            *value = u8;
             return err;
         }
         case NVS_TYPE_I8: {
             int8_t i8;
             esp_err_t err = nvs_get_i8(handle_, key, &i8);
-            *value        = i8;
+            *value = i8;
             return err;
         }
         case NVS_TYPE_U16: {
             uint16_t u16;
             esp_err_t err = nvs_get_u16(handle_, key, &u16);
-            *value        = u16;
+            *value = u16;
             return err;
         }
         case NVS_TYPE_I16: {
             int16_t i16;
             esp_err_t err = nvs_get_i16(handle_, key, &i16);
-            *value        = i16;
+            *value = i16;
             return err;
         }
         case NVS_TYPE_U32: {
             uint32_t u32;
             esp_err_t err = nvs_get_u32(handle_, key, &u32);
-            *value        = u32;
+            *value = u32;
             return err;
         }
         case NVS_TYPE_I32: {
             int32_t i32;
             esp_err_t err = nvs_get_i32(handle_, key, &i32);
-            *value        = i32;
+            *value = i32;
             return err;
         }
         case NVS_TYPE_U64: {
             uint64_t u64;
             esp_err_t err = nvs_get_u64(handle_, key, &u64);
-            *value        = u64;
+            *value = u64;
             return err;
         }
         case NVS_TYPE_I64: {
             int64_t i64;
             esp_err_t err = nvs_get_i64(handle_, key, &i64);
-            *value        = i64;
+            *value = i64;
             return err;
         }
         default:
@@ -201,7 +201,7 @@ esp_err_t NvsHandle::TypeOf(const char* type, nvs_type_t* nvs_type) {
         *nvs_type = NVS_TYPE_ANY;
     } else {
         *nvs_type = NVS_TYPE_ANY;
-        err       = ESP_ERR_NVS_TYPE_MISMATCH;
+        err = ESP_ERR_NVS_TYPE_MISMATCH;
     }
     return err;
 }

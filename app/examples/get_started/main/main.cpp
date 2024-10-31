@@ -22,7 +22,7 @@ void app_main(void) {
     App* app = App::GetInstance();
 
     status_led::LedDevice* led_device = new status_led::Ws2812Led(47, true);
-    StatusLed* led                    = new StatusLed(led_device);
+    StatusLed* led = new StatusLed(led_device);
 
     app->Init(led);
     app->Provision("CH", "fun24");

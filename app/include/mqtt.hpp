@@ -29,7 +29,7 @@ class MQTT {
         return esp_mqtt_client_publish(client_, topic, data, len, qos, retain);
     }
     std::string topic_base_ = "esp/";
-    bool connected_         = false;
+    bool connected_ = false;
 
    private:
     struct subscription {
@@ -41,7 +41,7 @@ class MQTT {
     static SemaphoreHandle_t semaphore_;
 
     MQTT();
-    MQTT(MQTT const&)           = delete;
+    MQTT(MQTT const&) = delete;
     void operator=(MQTT const&) = delete;
 
     void EventHandler(esp_event_base_t event_base, int32_t event_id, void* event_data);

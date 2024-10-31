@@ -1,5 +1,5 @@
 idf_component_register(
-    SRCS 
+    SRCS
         "src/app.cpp"
         "src/firmware_updater.cpp"
         "src/get_info.cpp"

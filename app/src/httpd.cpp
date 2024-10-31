@@ -21,7 +21,7 @@
 
 static const char* kTag = "httpd";
 
-Httpd* Httpd::instance_             = nullptr;
+Httpd* Httpd::instance_ = nullptr;
 SemaphoreHandle_t Httpd::semaphore_ = xSemaphoreCreateMutex();
 
 Httpd* Httpd::GetInstance() {
@@ -40,10 +40,10 @@ void Httpd::AddRoute(const char* uri,
                      esp_err_t (*handler)(httpd_req_t* r),
                      void* user_ctx) {
     httpd_uri_t route = {};
-    route.uri         = uri;
-    route.method      = method;
-    route.handler     = handler;
-    route.user_ctx    = user_ctx;
+    route.uri = uri;
+    route.method = method;
+    route.handler = handler;
+    route.user_ctx = user_ctx;
     routes_.push_back(route);
 }
 
@@ -52,9 +52,9 @@ void Httpd::Start(size_t stack_size, int max_uri_handlers) {
         ESP_LOGW(kTag, "Server already started");
         return;
     }
-    httpd_handle_t server   = nullptr;
-    httpd_config_t config   = HTTPD_DEFAULT_CONFIG();
-    config.stack_size       = stack_size;
+    httpd_handle_t server = nullptr;
+    httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+    config.stack_size = stack_size;
     config.lru_purge_enable = true;
     config.max_uri_handlers = max_uri_handlers;
     ESP_LOGI(kTag, "Starting server on port: '%d'", config.server_port);

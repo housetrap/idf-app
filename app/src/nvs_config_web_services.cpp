@@ -180,7 +180,7 @@ esp_err_t App::DoConfigSetKey(httpd_req_t* req) {
         return ESP_FAIL;
     }
 
-    cJSON* type  = cJSON_GetObjectItemCaseSensitive(json.get(), "type");
+    cJSON* type = cJSON_GetObjectItemCaseSensitive(json.get(), "type");
     cJSON* value = cJSON_GetObjectItemCaseSensitive(json.get(), "value");
 
     if ((!cJSON_IsString(type)) || (type->valuestring == nullptr)) {
@@ -324,14 +324,14 @@ esp_err_t App::DoConfigGetAll(httpd_req_t* req) {
     std::map<std::string, std::map<std::string, int>> config;
 
     nvs_iterator_t it = NULL;
-    esp_err_t res     = nvs_entry_find("nvs", nullptr, NVS_TYPE_ANY, &it);
+    esp_err_t res = nvs_entry_find("nvs", nullptr, NVS_TYPE_ANY, &it);
     while (res == ESP_OK) {
         nvs_entry_info_t info;
         nvs_entry_info(it, &info);
         ESP_LOGD(
             kTag, "Namespace '%s', key '%s', type '%d'", info.namespace_name, info.key, info.type);
         config[info.namespace_name][info.key] = info.type;
-        res                                   = nvs_entry_next(&it);
+        res = nvs_entry_next(&it);
     }
     nvs_release_iterator(it);
 

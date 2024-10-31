@@ -31,7 +31,7 @@ DELETE http://{{ ip }}/config/delete-namespace
 ```
 
 ## Set key (MQTT Broker)
-    
+
 ```rest
 POST http://{{ ip }}/config/set-key
     ?namespace=mqtt
@@ -44,7 +44,7 @@ content-type: application/json
 ```
 
 ## Set key (MQTT base topic)
-    
+
 
 ```rest
 POST http://{{ ip }}/config/set-key

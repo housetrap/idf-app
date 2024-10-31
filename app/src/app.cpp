@@ -31,7 +31,7 @@
 
 static const char* kTag = "app";
 
-App* App::instance_               = nullptr;
+App* App::instance_ = nullptr;
 SemaphoreHandle_t App::semaphore_ = xSemaphoreCreateMutex();
 
 static void* psram_malloc(size_t size) { return heap_caps_malloc(size, MALLOC_CAP_SPIRAM); }
@@ -66,7 +66,7 @@ App::App() {
     err = nvs_open("system", NVS_READWRITE, &my_handle);
     if (err == ESP_OK) {
         size_t size = sizeof(hostname);
-        err         = nvs_get_str(my_handle, "hostname", hostname, &size);
+        err = nvs_get_str(my_handle, "hostname", hostname, &size);
         if (err == ESP_OK) {
             ESP_LOGI(kTag, "Hostname : %s", hostname);
             err = esp_netif_set_hostname(wifi_, hostname);
@@ -82,10 +82,10 @@ App::App() {
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
 
-    httpd_   = Httpd::GetInstance();
-    mqtt_    = MQTT::GetInstance();
+    httpd_ = Httpd::GetInstance();
+    mqtt_ = MQTT::GetInstance();
     updater_ = Updater::GetInstance();
-    prov_    = Provisioner::GetInstance();
+    prov_ = Provisioner::GetInstance();
 }
 
 App* App::GetInstance() {
@@ -136,7 +136,7 @@ void App::Provision(const char* country, const char* proof_of_possession) {
         led_->On(kBlue);
     }
     char* wifi_hostname = nullptr;
-    esp_err_t err       = esp_netif_get_hostname(wifi_, (const char**)&wifi_hostname);
+    esp_err_t err = esp_netif_get_hostname(wifi_, (const char**)&wifi_hostname);
     if (err == ESP_OK) {
         ESP_LOGI(kTag, "Hostname : %s", wifi_hostname);
         strncpy(hostname_, wifi_hostname, sizeof(hostname_));
@@ -150,15 +150,15 @@ void App::ResetProvisioning() { prov_->ResetProvisioning(); }
 void App::ReprovionerTask() {
     ESP_LOGI(kTag, "ReprovionerTask started");
     gpio_config_t io_conf = {};
-    io_conf.intr_type     = GPIO_INTR_DISABLE;
-    io_conf.mode          = GPIO_MODE_INPUT;
-    io_conf.pin_bit_mask  = 1ULL << GPIO_NUM_0;
-    io_conf.pull_down_en  = GPIO_PULLDOWN_DISABLE;
-    io_conf.pull_up_en    = GPIO_PULLUP_ENABLE;
+    io_conf.intr_type = GPIO_INTR_DISABLE;
+    io_conf.mode = GPIO_MODE_INPUT;
+    io_conf.pin_bit_mask = 1ULL << GPIO_NUM_0;
+    io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
+    io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
     ESP_ERROR_CHECK(gpio_config(&io_conf));
 
     int64_t start_pressed = 0;
-    int prev_btn_state    = 1;
+    int prev_btn_state = 1;
 
     while (1) {
         int btn_state = gpio_get_level(GPIO_NUM_0);
@@ -212,7 +212,7 @@ esp_err_t App::StartMdns(const char* name) {
 
 esp_err_t App::DoFirmwareUpgrade(httpd_req_t* req) {
     const int kBufferSize = 4096;
-    App* ctx              = (App*)req->user_ctx;
+    App* ctx = (App*)req->user_ctx;
     std::shared_ptr<char> buffer((char*)heap_caps_malloc(kBufferSize, MALLOC_CAP_SPIRAM),
                                  heap_caps_free);
 

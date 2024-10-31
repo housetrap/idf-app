@@ -66,8 +66,8 @@ esp_err_t App::DoGetInfo(httpd_req_t* req) {
     cJSON_AddStringToObject(response.get(), "hostname", ctx->hostname_);
 
     UBaseType_t nOfTasks = uxTaskGetNumberOfTasks();
-    TaskStatus_t* data   = new TaskStatus_t[nOfTasks];
-    UBaseType_t res      = uxTaskGetSystemState(data, nOfTasks, nullptr);
+    TaskStatus_t* data = new TaskStatus_t[nOfTasks];
+    UBaseType_t res = uxTaskGetSystemState(data, nOfTasks, nullptr);
     if (res == pdFALSE) {
         ESP_LOGE(kTag, "Failed to get task status");
         delete[] data;

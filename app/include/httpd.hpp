@@ -52,8 +52,8 @@ class Httpd {
     static Httpd* instance_;
     static SemaphoreHandle_t semaphore_;
 
-    Httpd() {};
-    Httpd(Httpd const&)          = delete;
+    Httpd(){};
+    Httpd(Httpd const&) = delete;
     void operator=(Httpd const&) = delete;
 
     httpd_handle_t* server_ = nullptr;

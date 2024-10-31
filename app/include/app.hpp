@@ -92,7 +92,7 @@ class App {
     void ReprovionerTask();
 
     App();
-    App(App const&)            = delete;
+    App(App const&) = delete;
     void operator=(App const&) = delete;
 
     esp_netif_t* wifi_ = nullptr;
