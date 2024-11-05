@@ -154,10 +154,8 @@ esp_err_t App::DoConfigSetKey(httpd_req_t* req) {
 
     const int kBufferSize = 4096;
 #if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_CAPS_ALLOC
-    LLOC
-
-        std::shared_ptr<char>
-            buffer((char*)heap_caps_malloc(kBufferSize, MALLOC_CAP_SPIRAM), heap_caps_free);
+    std::shared_ptr<char> buffer((char*)heap_caps_malloc(kBufferSize, MALLOC_CAP_SPIRAM),
+                                 heap_caps_free);
 #else
     std::shared_ptr<char> buffer((char*)malloc(kBufferSize), free);
 #endif
