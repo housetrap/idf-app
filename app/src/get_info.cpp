@@ -137,7 +137,8 @@ esp_err_t App::DoGetInfo(httpd_req_t* req) {
         const char* name;
         uint32_t caps;
     } caps_heaps[] = {
-#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_MALLOC
+#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_CAPS_ALLOC
+
         {"SPIRAM", MALLOC_CAP_SPIRAM},
 #endif
         {"DEFAULT", MALLOC_CAP_DEFAULT},

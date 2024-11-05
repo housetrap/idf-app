@@ -28,6 +28,7 @@
 
 #include "cJSON.h"
 #include "driver/gpio.h"
+#include "sdkconfig.h"
 #include "status_led.hpp"
 
 static const char* kTag = "app";
@@ -35,14 +36,16 @@ static const char* kTag = "app";
 App* App::instance_ = nullptr;
 SemaphoreHandle_t App::semaphore_ = xSemaphoreCreateMutex();
 
-#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_MALLOC
+#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_CAPS_ALLOC
+
 static void* psram_malloc(size_t size) { return heap_caps_malloc(size, MALLOC_CAP_SPIRAM); }
 static void psram_free(void* ptr) { heap_caps_free(ptr); }
 #endif
 
 App::App() {
     ESP_LOGI(kTag, "Creating App ...");
-#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_MALLOC
+#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_CAPS_ALLOC
+
     cJSON_Hooks hooks = {.malloc_fn = psram_malloc, .free_fn = psram_free};
     cJSON_InitHooks(&hooks);
 #endif
@@ -218,7 +221,8 @@ esp_err_t App::StartMdns(const char* name) {
 esp_err_t App::DoFirmwareUpgrade(httpd_req_t* req) {
     const int kBufferSize = 4096;
     App* ctx = (App*)req->user_ctx;
-#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_MALLOC
+#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_CAPS_ALLOC
+
     std::shared_ptr<char> buffer((char*)heap_caps_malloc(kBufferSize, MALLOC_CAP_SPIRAM),
                                  heap_caps_free);
 #else

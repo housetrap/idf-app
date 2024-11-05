@@ -23,6 +23,7 @@
 #include "app.hpp"
 #include "cJSON.h"
 #include "nvs_config.hpp"
+#include "sdkconfig.h"
 
 static const char* kTag = "config webservices";
 
@@ -86,7 +87,7 @@ static esp_err_t JsonNode(cJSON* json,
                     req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to get string value");
                 return ESP_FAIL;
             }
-#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_MALLOC
+#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_CAPS_ALLOC
             std::shared_ptr<char> value((char*)heap_caps_malloc(size, MALLOC_CAP_SPIRAM),
                                         heap_caps_free);
 #else
@@ -107,7 +108,7 @@ static esp_err_t JsonNode(cJSON* json,
                     req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to get blob value");
                 return ESP_FAIL;
             }
-#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_MALLOC
+#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_CAPS_ALLOC
             std::shared_ptr<void> value((void*)heap_caps_malloc(size, MALLOC_CAP_SPIRAM),
                                         heap_caps_free);
 #else
@@ -120,7 +121,8 @@ static esp_err_t JsonNode(cJSON* json,
             }
 
             size_t enc64_size = 4 + size * 2;
-#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_MALLOC
+#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_CAPS_ALLOC
+
             std::shared_ptr<char> enc64((char*)heap_caps_malloc(enc64_size, MALLOC_CAP_SPIRAM),
                                         heap_caps_free);
 #else
@@ -151,9 +153,11 @@ esp_err_t App::DoConfigSetKey(httpd_req_t* req) {
     App* ctx = (App*)req->user_ctx;
 
     const int kBufferSize = 4096;
-#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_MALLOC
-    std::shared_ptr<char> buffer((char*)heap_caps_malloc(kBufferSize, MALLOC_CAP_SPIRAM),
-                                 heap_caps_free);
+#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_CAPS_ALLOC
+    LLOC
+
+        std::shared_ptr<char>
+            buffer((char*)heap_caps_malloc(kBufferSize, MALLOC_CAP_SPIRAM), heap_caps_free);
 #else
     std::shared_ptr<char> buffer((char*)malloc(kBufferSize), free);
 #endif
@@ -249,7 +253,8 @@ esp_err_t App::DoConfigSetKey(httpd_req_t* req) {
             ESP_LOGI(kTag, "Set string value '%s'", value->valuestring);
         } else if (nvs_type == NVS_TYPE_BLOB) {
             size_t olen;
-#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_MALLOC
+#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_CAPS_ALLOC
+
             std::shared_ptr<void> dec64(
                 (void*)heap_caps_malloc(strlen(value->valuestring), MALLOC_CAP_SPIRAM),
                 heap_caps_free);
@@ -296,7 +301,8 @@ esp_err_t App::DoConfigGetKey(httpd_req_t* req) {
     App* ctx = (App*)req->user_ctx;
 
     const size_t kBufferSize = 1024;
-#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_MALLOC
+#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_CAPS_ALLOC
+
     std::shared_ptr<char> buffer((char*)heap_caps_malloc(kBufferSize, MALLOC_CAP_SPIRAM),
                                  heap_caps_free);
 #else
@@ -386,7 +392,8 @@ esp_err_t App::DoConfigDeleteKey(httpd_req_t* req) {
     App* ctx = (App*)req->user_ctx;
 
     const size_t kBufferSize = 1024;
-#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_MALLOC
+#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_CAPS_ALLOC
+
     std::shared_ptr<char> buffer((char*)heap_caps_malloc(kBufferSize, MALLOC_CAP_SPIRAM),
                                  heap_caps_free);
 #else
@@ -428,7 +435,8 @@ esp_err_t App::DoConfigDeleteNameSpace(httpd_req_t* req) {
     App* ctx = (App*)req->user_ctx;
 
     const size_t kBufferSize = 1024;
-#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_MALLOC
+#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_CAPS_ALLOC
+
     std::shared_ptr<char> buffer((char*)heap_caps_malloc(kBufferSize, MALLOC_CAP_SPIRAM),
                                  heap_caps_free);
 #else
