@@ -50,6 +50,6 @@ jobs:
         with:
           name: ${{ env.COMPONENT }}
           version: ${{ github.ref_name }}
-          namespace: 'supcik'
+          namespace: 'housetrap'
           api_token: ${{ secrets.IDF_COMPONENT_API_TOKEN }}
           directories: ${{ env.COMPONENT }}

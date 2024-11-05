@@ -13,10 +13,11 @@
 
 class MQTT {
    public:
+    using LastWill = esp_mqtt_client_config_t::session_t::last_will_t;
     static MQTT* GetInstance();
     void AddSubscription(const char* topic, int qos = 1);
     void SetLed(StatusLed* led) { led_ = led; }
-    esp_err_t Init();
+    esp_err_t Init(LastWill* last_will = nullptr);
     esp_err_t Start();
 
     esp_err_t RegisterEventHandler(esp_mqtt_event_id_t event,

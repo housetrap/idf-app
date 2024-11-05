@@ -45,7 +45,7 @@ class App {
         httpd_->Start(stack_size, max_uri_handlers);
     }
 
-    esp_err_t InitMQTT() { return mqtt_->Init(); }
+    esp_err_t InitMQTT(MQTT::LastWill* last_will = nullptr) { return mqtt_->Init(last_will); }
     void AddSubscription(const char* topic, int qos = 1) { mqtt_->AddSubscription(topic, qos); }
     esp_err_t RegisterMQTTEventHandler(esp_mqtt_event_id_t event,
                                        esp_event_handler_t event_handler,

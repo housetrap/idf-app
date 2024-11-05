@@ -53,7 +53,7 @@ void MQTT::AddSubscription(const char* topic, int qos) {
 
 MQTT::MQTT() { connected_ = false; }
 
-esp_err_t MQTT::Init() {
+esp_err_t MQTT::Init(LastWill* last_will) {
     NvsHandle handle;
 
     char broker[64] = {0};
@@ -86,6 +86,9 @@ esp_err_t MQTT::Init() {
     if (strlen(username) > 0 && strlen(password) > 0) {
         mqtt_cfg.credentials.username = username;
         mqtt_cfg.credentials.authentication.password = password;
+    }
+    if (last_will != nullptr) {
+        mqtt_cfg.session.last_will = *last_will;
     }
 
     ESP_LOGI(kTag, "MQTT URI: %s", broker);

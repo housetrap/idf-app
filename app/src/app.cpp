@@ -22,6 +22,7 @@
 #include <freertos/task.h>
 #include <mdns.h>
 #include <nvs_flash.h>
+#include <wifi_provisioning/manager.h>
 
 #include <memory>
 
@@ -145,7 +146,7 @@ void App::Provision(const char* country, const char* proof_of_possession) {
     }
 }
 
-void App::ResetProvisioning() { prov_->ResetProvisioning(); }
+void App::ResetProvisioning() { wifi_prov_mgr_reset_provisioning(); }
 
 void App::ReprovionerTask() {
     ESP_LOGI(kTag, "ReprovionerTask started");
