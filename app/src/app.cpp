@@ -35,13 +35,17 @@ static const char* kTag = "app";
 App* App::instance_ = nullptr;
 SemaphoreHandle_t App::semaphore_ = xSemaphoreCreateMutex();
 
+#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_MALLOC
 static void* psram_malloc(size_t size) { return heap_caps_malloc(size, MALLOC_CAP_SPIRAM); }
 static void psram_free(void* ptr) { heap_caps_free(ptr); }
+#endif
 
 App::App() {
     ESP_LOGI(kTag, "Creating App ...");
+#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_MALLOC
     cJSON_Hooks hooks = {.malloc_fn = psram_malloc, .free_fn = psram_free};
     cJSON_InitHooks(&hooks);
+#endif
 
     // Initialize NVS partition
     esp_err_t err = nvs_flash_init();
@@ -214,10 +218,13 @@ esp_err_t App::StartMdns(const char* name) {
 esp_err_t App::DoFirmwareUpgrade(httpd_req_t* req) {
     const int kBufferSize = 4096;
     App* ctx = (App*)req->user_ctx;
+#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_MALLOC
     std::shared_ptr<char> buffer((char*)heap_caps_malloc(kBufferSize, MALLOC_CAP_SPIRAM),
                                  heap_caps_free);
+#else
+    std::shared_ptr<char> buffer((char*)malloc(kBufferSize));
+#endif
 
-    // char* buffer = (char*)heap_caps_malloc(kBufferSize, MALLOC_CAP_SPIRAM);
     int res = ctx->httpd_->Receive(req, buffer.get(), kBufferSize);
     if (res < 0) {
         ctx->httpd_->SendError(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to receive data");

@@ -86,8 +86,12 @@ static esp_err_t JsonNode(cJSON* json,
                     req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to get string value");
                 return ESP_FAIL;
             }
+#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_MALLOC
             std::shared_ptr<char> value((char*)heap_caps_malloc(size, MALLOC_CAP_SPIRAM),
                                         heap_caps_free);
+#else
+            std::shared_ptr<char> value((char*)malloc(size));
+#endif
             if (handle.GetString(key, value.get(), &size) != ESP_OK) {
                 ctx->httpd_->SendError(
                     req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to get string value");
@@ -103,8 +107,12 @@ static esp_err_t JsonNode(cJSON* json,
                     req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to get blob value");
                 return ESP_FAIL;
             }
+#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_MALLOC
             std::shared_ptr<void> value((void*)heap_caps_malloc(size, MALLOC_CAP_SPIRAM),
                                         heap_caps_free);
+#else
+            std::shared_ptr<void> value((void*)malloc(size));
+#endif
             if (handle.GetBlob(key, value.get(), &size) != ESP_OK) {
                 ctx->httpd_->SendError(
                     req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to get blob value");
@@ -112,8 +120,12 @@ static esp_err_t JsonNode(cJSON* json,
             }
 
             size_t enc64_size = 4 + size * 2;
+#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_MALLOC
             std::shared_ptr<char> enc64((char*)heap_caps_malloc(enc64_size, MALLOC_CAP_SPIRAM),
                                         heap_caps_free);
+#else
+            std::shared_ptr<char> enc64((char*)malloc(enc64_size));
+#endif
 
             size_t olen;
             if (NvsHandle::Base64Encode(
@@ -139,8 +151,12 @@ esp_err_t App::DoConfigSetKey(httpd_req_t* req) {
     App* ctx = (App*)req->user_ctx;
 
     const int kBufferSize = 4096;
+#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_MALLOC
     std::shared_ptr<char> buffer((char*)heap_caps_malloc(kBufferSize, MALLOC_CAP_SPIRAM),
                                  heap_caps_free);
+#else
+    std::shared_ptr<char> buffer((char*)malloc(kBufferSize));
+#endif
 
     if (httpd_req_get_url_query_str(req, buffer.get(), kBufferSize) != ESP_OK) {
         ctx->httpd_->SendError(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to get query string");
@@ -233,9 +249,13 @@ esp_err_t App::DoConfigSetKey(httpd_req_t* req) {
             ESP_LOGI(kTag, "Set string value '%s'", value->valuestring);
         } else if (nvs_type == NVS_TYPE_BLOB) {
             size_t olen;
+#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_MALLOC
             std::shared_ptr<void> dec64(
                 (void*)heap_caps_malloc(strlen(value->valuestring), MALLOC_CAP_SPIRAM),
                 heap_caps_free);
+#else
+            std::shared_ptr<void> dec64((void*)malloc(strlen(value->valuestring)));
+#endif
             if (NvsHandle::Base64Decode((char*)dec64.get(),
                                         strlen(value->valuestring),
                                         &olen,
@@ -276,8 +296,12 @@ esp_err_t App::DoConfigGetKey(httpd_req_t* req) {
     App* ctx = (App*)req->user_ctx;
 
     const size_t kBufferSize = 1024;
+#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_MALLOC
     std::shared_ptr<char> buffer((char*)heap_caps_malloc(kBufferSize, MALLOC_CAP_SPIRAM),
                                  heap_caps_free);
+#else
+    std::shared_ptr<char> buffer((char*)malloc(kBufferSize));
+#endif
 
     if (httpd_req_get_url_query_str(req, buffer.get(), kBufferSize) != ESP_OK) {
         ctx->httpd_->SendError(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to get query string");
@@ -362,8 +386,12 @@ esp_err_t App::DoConfigDeleteKey(httpd_req_t* req) {
     App* ctx = (App*)req->user_ctx;
 
     const size_t kBufferSize = 1024;
+#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_MALLOC
     std::shared_ptr<char> buffer((char*)heap_caps_malloc(kBufferSize, MALLOC_CAP_SPIRAM),
                                  heap_caps_free);
+#else
+    std::shared_ptr<char> buffer((char*)malloc(kBufferSize));
+#endif
 
     if (httpd_req_get_url_query_str(req, buffer.get(), kBufferSize) != ESP_OK) {
         ctx->httpd_->SendError(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to get query string");
@@ -400,8 +428,12 @@ esp_err_t App::DoConfigDeleteNameSpace(httpd_req_t* req) {
     App* ctx = (App*)req->user_ctx;
 
     const size_t kBufferSize = 1024;
+#if defined CONFIG_SPIRAM && defined CONFIG_SPIRAM_USE_MALLOC
     std::shared_ptr<char> buffer((char*)heap_caps_malloc(kBufferSize, MALLOC_CAP_SPIRAM),
                                  heap_caps_free);
+#else
+    std::shared_ptr<char> buffer((char*)malloc(kBufferSize));
+#endif
 
     if (httpd_req_get_url_query_str(req, buffer.get(), kBufferSize) != ESP_OK) {
         ctx->httpd_->SendError(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to get query string");
