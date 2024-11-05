@@ -222,7 +222,7 @@ esp_err_t App::DoFirmwareUpgrade(httpd_req_t* req) {
     std::shared_ptr<char> buffer((char*)heap_caps_malloc(kBufferSize, MALLOC_CAP_SPIRAM),
                                  heap_caps_free);
 #else
-    std::shared_ptr<char> buffer((char*)malloc(kBufferSize));
+    std::shared_ptr<char> buffer((char*)malloc(kBufferSize), free);
 #endif
 
     int res = ctx->httpd_->Receive(req, buffer.get(), kBufferSize);

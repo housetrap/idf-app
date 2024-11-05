@@ -90,7 +90,7 @@ static esp_err_t JsonNode(cJSON* json,
             std::shared_ptr<char> value((char*)heap_caps_malloc(size, MALLOC_CAP_SPIRAM),
                                         heap_caps_free);
 #else
-            std::shared_ptr<char> value((char*)malloc(size));
+            std::shared_ptr<char> value((char*)malloc(size), free);
 #endif
             if (handle.GetString(key, value.get(), &size) != ESP_OK) {
                 ctx->httpd_->SendError(
@@ -111,7 +111,7 @@ static esp_err_t JsonNode(cJSON* json,
             std::shared_ptr<void> value((void*)heap_caps_malloc(size, MALLOC_CAP_SPIRAM),
                                         heap_caps_free);
 #else
-            std::shared_ptr<void> value((void*)malloc(size));
+            std::shared_ptr<void> value((void*)malloc(size), free);
 #endif
             if (handle.GetBlob(key, value.get(), &size) != ESP_OK) {
                 ctx->httpd_->SendError(
@@ -124,7 +124,7 @@ static esp_err_t JsonNode(cJSON* json,
             std::shared_ptr<char> enc64((char*)heap_caps_malloc(enc64_size, MALLOC_CAP_SPIRAM),
                                         heap_caps_free);
 #else
-            std::shared_ptr<char> enc64((char*)malloc(enc64_size));
+            std::shared_ptr<char> enc64((char*)malloc(enc64_size), free);
 #endif
 
             size_t olen;
@@ -155,7 +155,7 @@ esp_err_t App::DoConfigSetKey(httpd_req_t* req) {
     std::shared_ptr<char> buffer((char*)heap_caps_malloc(kBufferSize, MALLOC_CAP_SPIRAM),
                                  heap_caps_free);
 #else
-    std::shared_ptr<char> buffer((char*)malloc(kBufferSize));
+    std::shared_ptr<char> buffer((char*)malloc(kBufferSize), free);
 #endif
 
     if (httpd_req_get_url_query_str(req, buffer.get(), kBufferSize) != ESP_OK) {
@@ -254,7 +254,7 @@ esp_err_t App::DoConfigSetKey(httpd_req_t* req) {
                 (void*)heap_caps_malloc(strlen(value->valuestring), MALLOC_CAP_SPIRAM),
                 heap_caps_free);
 #else
-            std::shared_ptr<void> dec64((void*)malloc(strlen(value->valuestring)));
+            std::shared_ptr<void> dec64((void*)malloc(strlen(value->valuestring)), free);
 #endif
             if (NvsHandle::Base64Decode((char*)dec64.get(),
                                         strlen(value->valuestring),
@@ -300,7 +300,7 @@ esp_err_t App::DoConfigGetKey(httpd_req_t* req) {
     std::shared_ptr<char> buffer((char*)heap_caps_malloc(kBufferSize, MALLOC_CAP_SPIRAM),
                                  heap_caps_free);
 #else
-    std::shared_ptr<char> buffer((char*)malloc(kBufferSize));
+    std::shared_ptr<char> buffer((char*)malloc(kBufferSize), free);
 #endif
 
     if (httpd_req_get_url_query_str(req, buffer.get(), kBufferSize) != ESP_OK) {
@@ -390,7 +390,7 @@ esp_err_t App::DoConfigDeleteKey(httpd_req_t* req) {
     std::shared_ptr<char> buffer((char*)heap_caps_malloc(kBufferSize, MALLOC_CAP_SPIRAM),
                                  heap_caps_free);
 #else
-    std::shared_ptr<char> buffer((char*)malloc(kBufferSize));
+    std::shared_ptr<char> buffer((char*)malloc(kBufferSize), free);
 #endif
 
     if (httpd_req_get_url_query_str(req, buffer.get(), kBufferSize) != ESP_OK) {
@@ -432,7 +432,7 @@ esp_err_t App::DoConfigDeleteNameSpace(httpd_req_t* req) {
     std::shared_ptr<char> buffer((char*)heap_caps_malloc(kBufferSize, MALLOC_CAP_SPIRAM),
                                  heap_caps_free);
 #else
-    std::shared_ptr<char> buffer((char*)malloc(kBufferSize));
+    std::shared_ptr<char> buffer((char*)malloc(kBufferSize), free);
 #endif
 
     if (httpd_req_get_url_query_str(req, buffer.get(), kBufferSize) != ESP_OK) {
