@@ -125,7 +125,7 @@ void MQTT::EventHandler(esp_event_base_t event_base, int32_t event_id, void* eve
             connected_ = true;
             ESP_LOGI(kTag, "MQTT_EVENT_CONNECTED");
             for (auto& s : subscriptions_) {
-                const char* filter = (topic_base_ + s.topic).c_str();
+                const char* filter = s.topic.c_str();
                 ESP_LOGI(kTag, "- Subscribing to %s", filter);
                 esp_mqtt_client_subscribe(client, filter, s.qos);
             }

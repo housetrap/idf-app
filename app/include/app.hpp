@@ -46,7 +46,13 @@ class App {
     }
 
     esp_err_t InitMQTT(MQTT::LastWill* last_will = nullptr) { return mqtt_->Init(last_will); }
-    void AddSubscription(const char* topic, int qos = 1) { mqtt_->AddSubscription(topic, qos); }
+    void AddSubscription(const char* topic, bool prefixed = true, int qos = 1) {
+        if (prefixed) {
+            mqtt_->AddSubscription(mqtt_->Prefixed(topic).c_str(), qos);
+        } else {
+            mqtt_->AddSubscription(topic, qos);
+        }
+    }
     esp_err_t RegisterMQTTEventHandler(esp_mqtt_event_id_t event,
                                        esp_event_handler_t event_handler,
                                        void* event_handler_arg) {
@@ -62,6 +68,10 @@ class App {
     bool PendingUpdateVerification() { return updater_->PendingVerification(); }
     void CommitUpdate() { updater_->Commit(); }
     void RollbackUpdate() { updater_->Rollback(); }
+
+    StatusLed* GetStatusLed() { return led_; }
+    Httpd* GetHttpd() { return httpd_; }
+    MQTT* GetMQTT() { return mqtt_; }
 
     char hostname_[32];
 

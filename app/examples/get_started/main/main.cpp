@@ -48,7 +48,7 @@ void app_main(void) {
     }
 
     if (app->InitMQTT() == ESP_OK) {
-        app->AddSubscription("test/#", 1);
+        app->AddSubscription("test/#");
         app->StartMQTT();
     } else {
         ESP_LOGE(kTag, "Failed to initialize MQTT");
