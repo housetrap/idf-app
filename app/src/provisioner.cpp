@@ -188,16 +188,15 @@ void Provisioner::InitSTA() {
 }
 
 void Provisioner::Provision(const char* country, const char* proof_of_possession) {
-    esp_err_t err = esp_wifi_set_country_code(country, true);
-    if (err != ESP_OK) {
-        ESP_LOGW(kTag, "Failed to set country code");
-    }
-
     if (IsProvisioned()) {
         ESP_LOGI(kTag, "Already provisioned, starting Wi-Fi STA");
         wifi_prov_mgr_deinit();
         InitSTA();
     } else {
+        esp_err_t err = esp_wifi_set_country_code(country, true);
+        if (err != ESP_OK) {
+            ESP_LOGW(kTag, "Failed to set country code");
+        }
         retries_ = 0;
         ESP_LOGI(kTag, "Starting provisioning");
 
