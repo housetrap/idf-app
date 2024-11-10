@@ -124,6 +124,16 @@ esp_err_t MQTT::Start() {
     return ESP_OK;
 }
 
+esp_err_t MQTT::RegisterEventHandler(esp_mqtt_event_id_t event,
+                                     esp_event_handler_t event_handler,
+                                     void* event_handler_arg) {
+    if (fatal_error_) {
+        ESP_LOGE(kTag, "MQTT not initialized");
+        return ESP_FAIL;
+    }
+    return esp_mqtt_client_register_event(client_, event, event_handler, event_handler_arg);
+}
+
 esp_err_t MQTT::Publish(const char* topic, const char* data, int len, int qos, int retain) {
     if (fatal_error_) {
         ESP_LOGE(kTag, "MQTT not initialized");

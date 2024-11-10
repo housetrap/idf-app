@@ -22,9 +22,7 @@ class MQTT {
 
     esp_err_t RegisterEventHandler(esp_mqtt_event_id_t event,
                                    esp_event_handler_t event_handler,
-                                   void* event_handler_arg) {
-        return esp_mqtt_client_register_event(client_, event, event_handler, event_handler_arg);
-    }
+                                   void* event_handler_arg);
 
     std::string Prefixed(const char* topic) { return topic_base_ + topic; }
     esp_err_t Publish(const char* topic, const char* data, int len, int qos = 1, int retain = 0);
