@@ -27,11 +27,11 @@ class MQTT {
     }
 
     std::string Prefixed(const char* topic) { return topic_base_ + topic; }
+    esp_err_t Publish(const char* topic, const char* data, int len, int qos = 1, int retain = 0);
 
-    esp_err_t Publish(const char* topic, const char* data, int len, int qos = 1, int retain = 0) {
-        return esp_mqtt_client_publish(client_, topic, data, len, qos, retain);
-    }
     std::string topic_base_ = "esp/";
+
+    bool fatal_error_ = false;
     bool connected_ = false;
 
    private:
@@ -53,6 +53,9 @@ class MQTT {
                                       int32_t event_id,
                                       void* event_data) {
         MQTT* instance = static_cast<MQTT*>(arg);
+        if (instance == nullptr || instance->fatal_error_) {
+            return;
+        }
         instance->EventHandler(event_base, event_id, event_data);
     }
 

@@ -61,10 +61,13 @@ esp_err_t MQTT::Init(LastWill* last_will) {
     char password[64] = {0};
     char topic_base[64] = {0};
 
+    fatal_error_ = false;
+
     handle.Open("mqtt", NVS_READONLY);
     size_t length = sizeof(broker);
     if (handle.GetString("broker", broker, &length) != ESP_OK) {
         ESP_LOGE(kTag, "Failed to read broker from NVS");
+        fatal_error_ = true;
         return ESP_FAIL;
     }
 
@@ -76,10 +79,9 @@ esp_err_t MQTT::Init(LastWill* last_will) {
     length = sizeof(topic_base);
     if (handle.GetString("topic-base", topic_base, &length) != ESP_OK) {
         ESP_LOGE(kTag, "Failed to read topic_base from NVS");
-        return ESP_FAIL;
+    } else {
+        topic_base_ = std::string(topic_base);
     }
-
-    topic_base_ = std::string(topic_base);
 
     esp_mqtt_client_config_t mqtt_cfg = {};
     mqtt_cfg.broker.address.uri = broker;
@@ -95,18 +97,24 @@ esp_err_t MQTT::Init(LastWill* last_will) {
     client_ = esp_mqtt_client_init(&mqtt_cfg);
     if (client_ == nullptr) {
         ESP_LOGE(kTag, "esp_mqtt_client_init failed");
+        fatal_error_ = true;
         return ESP_FAIL;
     }
     esp_err_t err = esp_mqtt_client_register_event(
         client_, (esp_mqtt_event_id_t)ESP_EVENT_ANY_ID, EventHandlerForwarder, this);
     if (err != ESP_OK) {
         ESP_LOGE(kTag, "esp_mqtt_client_register_event failed: 0x%x", err);
+        fatal_error_ = true;
         return err;
     }
     return ESP_OK;
 }
 
 esp_err_t MQTT::Start() {
+    if (fatal_error_) {
+        ESP_LOGE(kTag, "MQTT not initialized");
+        return ESP_FAIL;
+    }
     esp_err_t err = esp_mqtt_client_start(client_);
     if (err != ESP_OK) {
         ESP_LOGE(kTag, "esp_mqtt_client_start failed: 0x%x", err);
@@ -114,6 +122,18 @@ esp_err_t MQTT::Start() {
     }
     ESP_LOGI(kTag, "MQTT started");
     return ESP_OK;
+}
+
+esp_err_t MQTT::Publish(const char* topic, const char* data, int len, int qos, int retain) {
+    if (fatal_error_) {
+        ESP_LOGE(kTag, "MQTT not initialized");
+        return ESP_FAIL;
+    }
+    if (!connected_) {
+        ESP_LOGE(kTag, "Not connected");
+        return ESP_FAIL;
+    }
+    return esp_mqtt_client_publish(client_, topic, data, len, qos, retain);
 }
 
 void MQTT::EventHandler(esp_event_base_t event_base, int32_t event_id, void* event_data) {
