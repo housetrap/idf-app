@@ -61,9 +61,7 @@ class App {
     esp_err_t StartMQTT() { return mqtt_->Start(); }
     std::string TopicBase() { return mqtt_->topic_base_; }
     esp_err_t PublishMessage(
-        const char* topic, const char* data, int len, int qos = 1, int retain = 0) {
-        return mqtt_->Publish(topic, data, len, qos, retain);
-    }
+        const char* topic, const char* data, bool prefixed = true, int qos = 1, int retain = 0);
 
     bool PendingUpdateVerification() { return updater_->PendingVerification(); }
     void CommitUpdate() { updater_->Commit(); }

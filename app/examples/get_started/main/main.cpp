@@ -57,6 +57,6 @@ void app_main(void) {
     while (true) {
         ESP_LOGI(kTag, "App running ...");
         vTaskDelay(pdMS_TO_TICKS(5000));
-        app->PublishMessage((app->TopicBase() + "ping").c_str(), "Hello MQTT", 0);
+        app->PublishMessage((app->TopicBase() + "ping").c_str(), "Hello MQTT");
     }
 }

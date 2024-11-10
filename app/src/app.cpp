@@ -127,6 +127,15 @@ void App::Init(StatusLed* led) {
     AddRoute("/info", HTTP_GET, DoGetInfo, this);
 }
 
+esp_err_t App::PublishMessage(
+    const char* topic, const char* data, bool prefixed, int qos, int retain) {
+    if (prefixed) {
+        return mqtt_->Publish(mqtt_->Prefixed(topic).c_str(), data, 0, qos, retain);
+    } else {
+        return mqtt_->Publish(topic, data, 0, qos, retain);
+    }
+}
+
 void App::Provision(const char* country, const char* proof_of_possession) {
     if (led_ != nullptr) {
         led_->Blink(100, 200, kBlue);
