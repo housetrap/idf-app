@@ -20,10 +20,24 @@
 #include <esp_log.h>
 #include <esp_ota_ops.h>
 
+#include <string>
+
 static const char* kTag = "firmware_upgrade";
 
 Updater* Updater::instance_ = nullptr;
 SemaphoreHandle_t Updater::semaphore_ = xSemaphoreCreateMutex();
+
+static esp_err_t HttpClientInitCallback(esp_http_client_handle_t client) {
+    Updater* updater = Updater::GetInstance();
+    for (const HttpHeader& header : updater->headers_) {
+        esp_err_t ret =
+            esp_http_client_set_header(client, header.key.c_str(), header.value.c_str());
+        if (ret != ESP_OK) {
+            return ret;
+        }
+    }
+    return ESP_OK;
+}
 
 Updater* Updater::GetInstance() {
     if (instance_ == nullptr) {
@@ -73,6 +87,15 @@ void Updater::EventHandler(esp_event_base_t event_base, int32_t event_id, void* 
     }
 }
 
+void Updater::AddHeader(const char* key, const char* value) { headers_.push_back({key, value}); }
+void Updater::AddHeader(const std::string key, const std::string value) {
+    headers_.push_back({key, value});
+}
+
+void Updater::AddBearerToken(const char* token) {
+    AddHeader("Authorization", std::string("Bearer ") + token);
+}
+
 esp_err_t Updater::Update(const char* url) {
     esp_http_client_config_t config = {};
     config.url = url;
@@ -81,6 +104,7 @@ esp_err_t Updater::Update(const char* url) {
     esp_https_ota_config_t ota_config = {};
     ota_config.http_config = &config;
     ota_config.partial_http_download = true;
+    ota_config.http_client_init_cb = HttpClientInitCallback;
 
     ESP_ERROR_CHECK(esp_event_handler_register(
         ESP_HTTPS_OTA_EVENT, ESP_EVENT_ANY_ID, EventHandlerForwarder, nullptr));

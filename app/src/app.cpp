@@ -268,6 +268,13 @@ esp_err_t App::DoFirmwareUpgrade(httpd_req_t* req) {
         return ESP_FAIL;
     }
 
+    ctx->updater_->ClearHeaders();
+
+    cJSON* bearer_token = cJSON_GetObjectItemCaseSensitive(json.get(), "bearer-token");
+    if (cJSON_IsString(bearer_token) && (bearer_token->valuestring != nullptr)) {
+        ctx->updater_->AddBearerToken(bearer_token->valuestring);
+    }
+
     ctx->httpd_->Reply(req, "Firmware update started\n");
     if (ctx->updater_->Update(url->valuestring) != ESP_OK) {
         ctx->httpd_->SendError(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to update firmware");

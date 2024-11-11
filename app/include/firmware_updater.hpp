@@ -20,6 +20,14 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 
+#include <string>
+#include <vector>
+
+struct HttpHeader {
+    std::string key;
+    std::string value;
+};
+
 class Updater {
    public:
     static Updater* GetInstance();
@@ -28,11 +36,20 @@ class Updater {
     void Commit() { esp_ota_mark_app_valid_cancel_rollback(); }
     void Rollback() { esp_ota_mark_app_invalid_rollback_and_reboot(); }
 
+    void AddHeader(const char* key, const char* value);
+    void AddHeader(const std::string key, const std::string value);
+
+    void AddBearerToken(const char* token);
+
+    void ClearHeaders() { headers_.clear(); }
+
+    std::vector<HttpHeader> headers_;
+
    private:
     static Updater* instance_;
     static SemaphoreHandle_t semaphore_;
 
-    Updater(){};
+    Updater() {};
     Updater(Updater const&) = delete;
     void operator=(Updater const&) = delete;
 
