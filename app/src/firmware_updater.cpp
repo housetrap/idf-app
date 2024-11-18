@@ -99,7 +99,7 @@ void Updater::AddBearerToken(const char* token) {
 esp_err_t Updater::Update(const char* url) {
     esp_http_client_config_t config = {};
     config.url = url;
-    config.buffer_size = 4096;
+    config.buffer_size_tx = 2048;
     config.crt_bundle_attach = esp_crt_bundle_attach;
 
     esp_https_ota_config_t ota_config = {};
