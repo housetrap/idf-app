@@ -49,7 +49,7 @@ class Updater {
     static Updater* instance_;
     static SemaphoreHandle_t semaphore_;
 
-    Updater() {};
+    Updater(){};
     Updater(Updater const&) = delete;
     void operator=(Updater const&) = delete;
 
