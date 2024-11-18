@@ -269,6 +269,7 @@ esp_err_t App::DoFirmwareUpgrade(httpd_req_t* req) {
     }
 
     ctx->updater_->ClearHeaders();
+    ctx->updater_->AddHeader("Accept", "application/octet-stream");
 
     cJSON* bearer_token = cJSON_GetObjectItemCaseSensitive(json.get(), "bearer-token");
     if (cJSON_IsString(bearer_token) && (bearer_token->valuestring != nullptr)) {
