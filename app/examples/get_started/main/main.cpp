@@ -21,7 +21,8 @@ esp_err_t Hello(httpd_req_t* req) {
 void app_main(void) {
     App* app = App::GetInstance();
 
-    status_led::LedDevice* led_device = new status_led::Ws2812Led(47, true);
+    status_led::LedDevice* led_device =
+        new status_led::Ws2812Led(47, LED_STRIP_COLOR_COMPONENT_FMT_RGB);
     StatusLed* led = new StatusLed(led_device);
 
     app->Init(led);
@@ -44,7 +45,7 @@ void app_main(void) {
     }
 
     if (app->led_ != nullptr) {
-        app->led_->On(kGreen);
+        app->led_->On(StatusLed::kGreen);
     }
 
     if (app->InitMQTT() == ESP_OK) {

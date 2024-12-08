@@ -2,7 +2,7 @@
 dependencies:
   app:
     override_path: "../../../"
-  supcik/status_led: "^1.0.5"
+  supcik/status_led: "^2.0.0"
   espressif/mdns: "*"
   idf:
     version: ">=5.3.0"

@@ -112,7 +112,7 @@ void App::Init(StatusLed* led) {
 
     led_ = led;
     if (led_ != nullptr) {
-        led_->On(kRed);
+        led_->On(StatusLed::kRed);
         prov_->SetLed(led_);
         mqtt_->SetLed(led_);
     }
@@ -138,7 +138,7 @@ esp_err_t App::PublishMessage(
 
 void App::Provision(const char* country, const char* proof_of_possession) {
     if (led_ != nullptr) {
-        led_->Blink(100, 200, kBlue);
+        led_->Blink(100, 200, StatusLed::kBlue);
     }
 
     xTaskCreate(ReprovionerTaskForwarder,
@@ -150,7 +150,7 @@ void App::Provision(const char* country, const char* proof_of_possession) {
 
     prov_->Provision(country, proof_of_possession);
     if (led_ != nullptr) {
-        led_->On(kBlue);
+        led_->On(StatusLed::kBlue);
     }
     char* wifi_hostname = nullptr;
     esp_err_t err = esp_netif_get_hostname(wifi_, (const char**)&wifi_hostname);
@@ -181,7 +181,7 @@ void App::ReprovionerTask() {
         int btn_state = gpio_get_level(GPIO_NUM_0);
         if (btn_state == 0) {
             if (led_ != nullptr) {
-                led_->Flash(200, 0, 1, kOrange);
+                led_->Flash(200, 0, 1, StatusLed::kOrange);
             }
             if (prev_btn_state == 1) {
                 ESP_LOGI(kTag, "Button pressed");
@@ -189,7 +189,7 @@ void App::ReprovionerTask() {
             } else if ((esp_timer_get_time() / 1000) - start_pressed > 10000) {
                 ESP_LOGI(kTag, "Starting reprovisioning");
                 if (led_ != nullptr) {
-                    led_->On(kOrange);
+                    led_->On(StatusLed::kOrange);
                 }
                 vTaskDelay(pdMS_TO_TICKS(2000));
                 ResetProvisioning();

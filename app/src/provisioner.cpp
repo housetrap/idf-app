@@ -121,7 +121,7 @@ void Provisioner::EventHandler(esp_event_base_t event_base, int32_t event_id, vo
             case WIFI_EVENT_STA_DISCONNECTED:
                 ESP_LOGI(kTag, "Disconnected. Connecting to the AP again...");
                 if (led_ != nullptr) {
-                    led_->Flash(200, 0, 1, kRed);
+                    led_->Flash(200, 0, 1, StatusLed::kRed);
                 }
                 esp_wifi_connect();
                 break;

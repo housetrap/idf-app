@@ -165,17 +165,11 @@ void MQTT::EventHandler(esp_event_base_t event_base, int32_t event_id, void* eve
             connected_ = false;
             break;
         case MQTT_EVENT_DATA:
-            if (led_ != nullptr) {
-                led_->Flash(100, 0, 1, kBlue);
-            }
             ESP_LOGD(kTag, "MQTT_EVENT_DATA");
             ESP_LOGD(kTag, "- TOPIC=%.*s\r\n", event->topic_len, event->topic);
             ESP_LOGD(kTag, "- DATA=%.*s\r\n", event->data_len, event->data);
             break;
         case MQTT_EVENT_PUBLISHED:
-            if (led_ != nullptr) {
-                led_->Flash(100, 0, 1, kWhite);
-            }
             break;
         case MQTT_EVENT_ERROR:
             ESP_LOGI(kTag, "MQTT_EVENT_ERROR");

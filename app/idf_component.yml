@@ -1,6 +1,6 @@
 dependencies:
   idf: ">=5.3"
-  supcik/status_led: "^1.0.5"
+  supcik/status_led: "^2.0.0"
   espressif/mdns: "*"
 description: App Component with HTTP and MQTT support
 license: MIT
