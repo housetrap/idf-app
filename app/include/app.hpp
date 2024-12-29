@@ -45,7 +45,9 @@ class App {
         httpd_->Start(stack_size, max_uri_handlers);
     }
 
-    esp_err_t InitMQTT(MQTT::LastWill* last_will = nullptr) { return mqtt_->Init(last_will); }
+    esp_err_t InitMQTT(MQTT::LastWill* last_will = nullptr, int keep_alive = 120) {
+        return mqtt_->Init(last_will, keep_alive);
+    }
     void AddSubscription(const char* topic, bool prefixed = true, int qos = 1) {
         if (prefixed) {
             mqtt_->AddSubscription(mqtt_->Prefixed(topic).c_str(), qos);
