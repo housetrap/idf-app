@@ -51,7 +51,21 @@ void MQTT::AddSubscription(const char* topic, int qos) {
     subscriptions_.push_back(t);
 }
 
-MQTT::MQTT() { connected_ = false; }
+MQTT::MQTT() {
+    connected_ = false;
+    char topic_base[64] = {0};
+
+    NvsHandle handle;
+    handle.Open("mqtt", NVS_READONLY);
+
+    size_t length = sizeof(topic_base);
+    if (handle.GetString("topic-base", topic_base, &length) != ESP_OK) {
+        ESP_LOGE(kTag, "Failed to read topic_base from NVS");
+    } else {
+        topic_base_ = std::string(topic_base);
+    }
+    handle.Close();
+}
 
 esp_err_t MQTT::Init(LastWill* last_will) {
     NvsHandle handle;
@@ -59,7 +73,6 @@ esp_err_t MQTT::Init(LastWill* last_will) {
     char broker[64] = {0};
     char username[64] = {0};
     char password[64] = {0};
-    char topic_base[64] = {0};
 
     fatal_error_ = false;
 
@@ -75,13 +88,7 @@ esp_err_t MQTT::Init(LastWill* last_will) {
     handle.GetString("username", username, &length);
     length = sizeof(password);
     handle.GetString("password", password, &length);
-
-    length = sizeof(topic_base);
-    if (handle.GetString("topic-base", topic_base, &length) != ESP_OK) {
-        ESP_LOGE(kTag, "Failed to read topic_base from NVS");
-    } else {
-        topic_base_ = std::string(topic_base);
-    }
+    handle.Close();
 
     esp_mqtt_client_config_t mqtt_cfg = {};
     mqtt_cfg.broker.address.uri = broker;
