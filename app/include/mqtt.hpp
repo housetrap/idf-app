@@ -17,7 +17,7 @@ class MQTT {
     static MQTT* GetInstance();
     void AddSubscription(const char* topic, int qos = 1);
     void SetLed(StatusLed* led) { led_ = led; }
-    esp_err_t Init(LastWill* last_will = nullptr);
+    esp_err_t Init(LastWill* last_will = nullptr, int keep_alive = 120);
     esp_err_t Start();
 
     esp_err_t RegisterEventHandler(esp_mqtt_event_id_t event,

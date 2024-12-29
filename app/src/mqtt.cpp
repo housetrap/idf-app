@@ -67,7 +67,7 @@ MQTT::MQTT() {
     handle.Close();
 }
 
-esp_err_t MQTT::Init(LastWill* last_will) {
+esp_err_t MQTT::Init(LastWill* last_will, int keep_alive) {
     NvsHandle handle;
 
     char broker[64] = {0};
@@ -99,6 +99,8 @@ esp_err_t MQTT::Init(LastWill* last_will) {
     if (last_will != nullptr) {
         mqtt_cfg.session.last_will = *last_will;
     }
+
+    mqtt_cfg.session.keepalive = keep_alive;
 
     ESP_LOGI(kTag, "MQTT URI: %s", broker);
     client_ = esp_mqtt_client_init(&mqtt_cfg);
