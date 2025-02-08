@@ -16,6 +16,7 @@
 
 #include <esp_err.h>
 #include <esp_log.h>
+#include <esp_timer.h>
 #include <esp_wifi.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
