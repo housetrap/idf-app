@@ -1,13 +1,15 @@
 dependencies:
-  idf: ">=5.3"
-  supcik/status_led: "^2.0.0"
-  espressif/mdns: "*"
+  idf: '>=6.0'
+  supcik/status_led: '*'
+  espressif/mdns: '*'
+  espressif/cjson: '*'
+  espressif/mqtt: '*'
+  espressif/network_provisioning: '*'
+
 description: App Component with HTTP and MQTT support
 license: MIT
 maintainers:
   - Jacques Supcik <jacques@supcik.net>
 repository: git://github.com/housetrap/idf-app.git
-repository_info:
-  path: app
-url: https://github.com/housetrap/idf-app/tree/main/app
-version: 2.1.3
+url: https://github.com/housetrap/idf-app/tree/main/
+version: 3.0.0

@@ -55,5 +55,6 @@ class Provisioner {
     StatusLed* led_ = nullptr;
     EventGroupHandle_t wifi_event_group_;
     char service_name_[32];
+    char service_key_[64];
     int retries_;
 };

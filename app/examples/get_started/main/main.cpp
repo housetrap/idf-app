@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Jacques Supcik <jacques@supcik.net>
+//
+// SPDX-License-Identifier: MIT
+
 #include <esp_err.h>
 #include <esp_log.h>
 #include <esp_wifi.h>
@@ -5,6 +9,7 @@
 #include "app.hpp"
 #include "httpd.hpp"
 #include "status_led.hpp"
+#include "status_led/ws2812_led_device.hpp"
 
 extern "C" {
 void app_main(void);
@@ -14,21 +19,21 @@ static const char* kTag = "app";
 
 esp_err_t Hello(httpd_req_t* req) {
     App* ctx = (App*)req->user_ctx;
-    ctx->httpd_->Reply(req, "Hello FunHouse\n");
+    ctx->httpd_->Reply(req, "Hello HouseTrap\n");
     return ESP_OK;
 }
 
 void app_main(void) {
     App* app = App::GetInstance();
 
-    status_led::LedDevice* led_device =
-        new status_led::Ws2812Led(47, LED_STRIP_COLOR_COMPONENT_FMT_RGB);
-    StatusLed* led = new StatusLed(led_device);
+    auto led_device = std::make_unique<status_led::Ws2812Led>(static_cast<gpio_num_t>(38),
+                                                              LED_STRIP_COLOR_COMPONENT_FMT_RGB);
+    StatusLed led(std::move(led_device));
 
-    app->Init(led);
-    app->Provision("CH", "fun24");
+    app->Init(&led);
+    app->Provision("CH", "ht26");
     app->AddRoute("/hello", HTTP_GET, Hello, app);
-    app->StartMdns("FunHouse Demo");
+    app->StartMdns("HouseTrap Demo");
     app->StartHttpd(8 * 1024, 32);
 
     if (app->PendingUpdateVerification()) {

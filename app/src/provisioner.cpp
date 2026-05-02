@@ -18,9 +18,10 @@
 #include <esp_event.h>
 #include <esp_log.h>
 #include <esp_wifi.h>
+#include <network_provisioning/manager.h>
+#include <network_provisioning/scheme_ble.h>
+#include <network_provisioning/scheme_softap.h>
 #include <nvs_flash.h>
-#include <wifi_provisioning/manager.h>
-#include <wifi_provisioning/scheme_ble.h>
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
@@ -43,10 +44,10 @@ Provisioner* Provisioner::GetInstance() {
 
 Provisioner::Provisioner() {
     // Configuration for the provisioning manager
-    wifi_prov_mgr_config_t config = {};
-    config.scheme = wifi_prov_scheme_ble;
-    config.scheme_event_handler = WIFI_PROV_SCHEME_BLE_EVENT_HANDLER_FREE_BTDM;
-    ESP_ERROR_CHECK(wifi_prov_mgr_init(config));
+    network_prov_mgr_config_t config = {};
+    config.scheme = network_prov_scheme_softap;
+    config.scheme_event_handler = NETWORK_PROV_EVENT_HANDLER_NONE;
+    ESP_ERROR_CHECK(network_prov_mgr_init(config));
 
     wifi_event_group_ = xEventGroupCreate();
     GetDefautlServiceName();
@@ -56,8 +57,7 @@ Provisioner::Provisioner() {
         esp_event_base_t event_base;
         int32_t event_id;
     } events[] = {
-        {WIFI_PROV_EVENT, ESP_EVENT_ANY_ID},
-        {PROTOCOMM_TRANSPORT_BLE_EVENT, ESP_EVENT_ANY_ID},
+        {NETWORK_PROV_EVENT, ESP_EVENT_ANY_ID},
         {PROTOCOMM_SECURITY_SESSION_EVENT, ESP_EVENT_ANY_ID},
         {WIFI_EVENT, ESP_EVENT_ANY_ID},
         {IP_EVENT, IP_EVENT_STA_GOT_IP},
@@ -70,12 +70,12 @@ Provisioner::Provisioner() {
 }
 
 void Provisioner::EventHandler(esp_event_base_t event_base, int32_t event_id, void* event_data) {
-    if (event_base == WIFI_PROV_EVENT) {
+    if (event_base == NETWORK_PROV_EVENT) {
         switch (event_id) {
-            case WIFI_PROV_START:
+            case NETWORK_PROV_START:
                 ESP_LOGI(kTag, "Provisioner started");
                 break;
-            case WIFI_PROV_CRED_RECV: {
+            case NETWORK_PROV_WIFI_CRED_RECV: {
                 wifi_sta_config_t* wifi_sta_cfg = (wifi_sta_config_t*)event_data;
                 ESP_LOGI(kTag,
                          "Received Wi-Fi credentials"
@@ -84,12 +84,14 @@ void Provisioner::EventHandler(esp_event_base_t event_base, int32_t event_id, vo
                          (const char*)wifi_sta_cfg->password);
                 break;
             }
-            case WIFI_PROV_CRED_FAIL: {
-                wifi_prov_sta_fail_reason_t* reason = (wifi_prov_sta_fail_reason_t*)event_data;
+            case NETWORK_PROV_WIFI_CRED_FAIL: {
+                network_prov_wifi_sta_fail_reason_t* reason =
+                    (network_prov_wifi_sta_fail_reason_t*)event_data;
+
                 ESP_LOGE(kTag,
                          "Provisioner failed!\n\tReason : %s"
                          "\n\tPlease reset to factory and retry provisioning",
-                         (*reason == WIFI_PROV_STA_AUTH_ERROR)
+                         (*reason == NETWORK_PROV_WIFI_STA_AUTH_ERROR)
                              ? "Wi-Fi station authentication failed"
                              : "Wi-Fi access-point not found");
                 retries_++;
@@ -97,18 +99,18 @@ void Provisioner::EventHandler(esp_event_base_t event_base, int32_t event_id, vo
                     ESP_LOGI(
                         kTag,
                         "Failed to connect with provisioned AP, resetting provisioned credentials");
-                    wifi_prov_mgr_reset_sm_state_on_failure();
+                    network_prov_mgr_reset_wifi_sm_state_on_failure();
                     retries_ = 0;
                 }
                 break;
             }
-            case WIFI_PROV_CRED_SUCCESS:
+            case NETWORK_PROV_WIFI_CRED_SUCCESS:
                 ESP_LOGI(kTag, "Provisioner successful");
                 retries_ = 0;
                 break;
-            case WIFI_PROV_END:
+            case NETWORK_PROV_END:
                 // De-initialize manager once provisioning is finished
-                wifi_prov_mgr_deinit();
+                network_prov_mgr_deinit();
                 break;
             default:
                 break;
@@ -133,17 +135,6 @@ void Provisioner::EventHandler(esp_event_base_t event_base, int32_t event_id, vo
         ESP_LOGI(kTag, "Connected with IP Address:" IPSTR, IP2STR(&event->ip_info.ip));
         // Signal main application to continue execution
         xEventGroupSetBits(wifi_event_group_, kWifiConnectedEvent);
-    } else if (event_base == PROTOCOMM_TRANSPORT_BLE_EVENT) {
-        switch (event_id) {
-            case PROTOCOMM_TRANSPORT_BLE_CONNECTED:
-                ESP_LOGI(kTag, "BLE transport: Connected!");
-                break;
-            case PROTOCOMM_TRANSPORT_BLE_DISCONNECTED:
-                ESP_LOGI(kTag, "BLE transport: Disconnected!");
-                break;
-            default:
-                break;
-        }
     } else if (event_base == PROTOCOMM_SECURITY_SESSION_EVENT) {
         switch (event_id) {
             case PROTOCOMM_SECURITY_SESSION_SETUP_OK:
@@ -165,7 +156,7 @@ void Provisioner::EventHandler(esp_event_base_t event_base, int32_t event_id, vo
 
 bool Provisioner::IsProvisioned() {
     bool provisioned = false;
-    ESP_ERROR_CHECK(wifi_prov_mgr_is_provisioned(&provisioned));
+    ESP_ERROR_CHECK(network_prov_mgr_is_wifi_provisioned(&provisioned));
     return provisioned;
 }
 
@@ -190,7 +181,7 @@ void Provisioner::InitSTA() {
 void Provisioner::Provision(const char* country, const char* proof_of_possession) {
     if (IsProvisioned()) {
         ESP_LOGI(kTag, "Already provisioned, starting Wi-Fi STA");
-        wifi_prov_mgr_deinit();
+        network_prov_mgr_deinit();
         InitSTA();
     } else {
         esp_err_t err = esp_wifi_set_country_code(country, true);
@@ -200,26 +191,19 @@ void Provisioner::Provision(const char* country, const char* proof_of_possession
         retries_ = 0;
         ESP_LOGI(kTag, "Starting provisioning");
 
-        // clang-format off
-        uint8_t custom_service_uuid[] = {  // LSB to MSB
-            0xb4, 0xdf, 0x5a, 0x1c, 0x3f, 0x6b, 0xf4, 0xbf,
-            0xea, 0x4a, 0x82, 0x03, 0x04, 0x90, 0x1a, 0x02,
-        };
-        // clang-format on
-
-        ESP_ERROR_CHECK(wifi_prov_scheme_ble_set_service_uuid(custom_service_uuid));
-        ESP_ERROR_CHECK(wifi_prov_mgr_start_provisioning(
-            WIFI_PROV_SECURITY_1, (const void*)proof_of_possession, service_name_, nullptr));
+        network_prov_security_t security = NETWORK_PROV_SECURITY_1;
+        ESP_ERROR_CHECK(network_prov_mgr_start_provisioning(
+            security, (const void*)proof_of_possession, service_name_, nullptr));
 
         // Deinitialization is triggered by the default event loop handler,
         // so we don't need to wait for the provisioning to finish.
-        // wifi_prov_mgr_wait();
-        // wifi_prov_mgr_deinit();
+        // network_prov_mgr_wait();
+        // network_prov_mgr_deinit();
     }
     xEventGroupWaitBits(wifi_event_group_, kWifiConnectedEvent, true, true, portMAX_DELAY);
 }
 
 void Provisioner::ResetProvisioning() {
     /* Resetting provisioning state machine to enable re-provisioning */
-    wifi_prov_mgr_reset_provisioning();
+    network_prov_mgr_reset_wifi_provisioning();
 }

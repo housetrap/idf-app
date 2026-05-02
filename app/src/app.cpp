@@ -22,8 +22,8 @@
 #include <freertos/semphr.h>
 #include <freertos/task.h>
 #include <mdns.h>
+#include <network_provisioning/manager.h>
 #include <nvs_flash.h>
-#include <wifi_provisioning/manager.h>
 
 #include <memory>
 
@@ -68,6 +68,8 @@ App::App() {
 
     // Initialize Wi-Fi including netif with default config
     wifi_ = esp_netif_create_default_wifi_sta();
+
+    esp_netif_create_default_wifi_ap();
 
     // Get Hostname from NVS "system:hostname" (if available)
     nvs_handle_t my_handle;
@@ -163,7 +165,7 @@ void App::Provision(const char* country, const char* proof_of_possession) {
     }
 }
 
-void App::ResetProvisioning() { wifi_prov_mgr_reset_provisioning(); }
+void App::ResetProvisioning() { network_prov_mgr_reset_wifi_provisioning(); }
 
 void App::ReprovionerTask() {
     ESP_LOGI(kTag, "ReprovionerTask started");

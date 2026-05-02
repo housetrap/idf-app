@@ -16,10 +16,9 @@ idf_component_register(
         "esp_http_server"
         "esp_https_ota"
         "esp_timer"
-        "json"
         "mbedtls"
         "mdns"
         "mqtt"
         "nvs_flash"
-        "wifi_provisioning"
+        "network_provisioning"
 )
