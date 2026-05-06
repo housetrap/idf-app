@@ -20,7 +20,6 @@
 #include <esp_wifi.h>
 #include <network_provisioning/manager.h>
 #include <network_provisioning/scheme_ble.h>
-#include <network_provisioning/scheme_softap.h>
 #include <nvs_flash.h>
 
 #include "freertos/FreeRTOS.h"
@@ -45,7 +44,7 @@ Provisioner* Provisioner::GetInstance() {
 Provisioner::Provisioner() {
     // Configuration for the provisioning manager
     network_prov_mgr_config_t config = {};
-    config.scheme = network_prov_scheme_softap;
+    config.scheme = network_prov_scheme_ble;
     config.scheme_event_handler = NETWORK_PROV_EVENT_HANDLER_NONE;
     ESP_ERROR_CHECK(network_prov_mgr_init(config));
 
